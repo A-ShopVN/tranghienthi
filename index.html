@@ -261,125 +261,147 @@ td.low {
 
 
 <script>
-  const SHEET_ID = "1ri9ZDmFpX5H5I1gBJJ2Pup83BfKyj1rCOYJlsX16ueY";
-  const SHEET_NAME = "KHO SACH";
+  const bookImages = {
+  "Đắc Nhân Tâm (Dale Carnegie)":
+    "https://ebookvie.com/wp-content/uploads/2024/02/Dac-Nhan-Tam-Dale-Carnegie-ebookvie.png",
 
-  const searchInput = document.getElementById("searchInput");
-  const tableHead = document.querySelector("#bookTable thead");
-  const tableBody = document.querySelector("#bookTable tbody");
+  "Nhà Giả Kim (Paulo Coelho)":
+    "https://th.bing.com/th/id/OIP._yzetDs3gher9vBV-Ax_iAHaL0?w=115&h=180&c=7&r=0&o=7&cb=ucfimg2&dpr=1.3&pid=1.7&rm=3&ucfimg=1",
 
-  const url = `https://docs.google.com/spreadsheets/d/${SHEET_ID}/gviz/tq?sheet=${SHEET_NAME}`;
+  "Tuổi trẻ đáng giá bao nhiêu?":
+    "https://i.pinimg.com/736x/37/8c/df/378cdf8dbf034e3e0e7b51edad4a7d3f.jpg",
 
-  let allRows = [];
-  let validColIndexes = [];
-  let validColLabels = [];
+  "Cà phê cùng Tony":
+    "https://nhungcuonsachhay.com/wp-content/uploads/2021/10/Ca-Phe-Cung-Tony-Tony-Buoi-Sang.jpg",
 
-  fetch(url)
-    .then(res => res.text())
-    .then(text => {
-      const json = JSON.parse(text.substring(47).slice(0, -2));
+  "Mắt Biếc (Nguyễn Nhật Ánh)":
+    "https://th.bing.com/th/id/OIP.MQCPs6JTGo36srhT4IzBVwAAAA?w=174&h=180&c=7&r=0&o=7&cb=ucfimg2&dpr=1.3&pid=1.7&rm=3&ucfimg=1",
 
-      // ===== LẤY CHỈ CỘT CÓ TIÊU ĐỀ =====
-      json.table.cols.forEach((col, index) => {
-        if (col.label && col.label.trim() !== "") {
-          validColIndexes.push(index);
-          validColLabels.push(col.label);
-        }
-      });
+  "Tôi thấy hoa vàng trên cỏ xanh":
+    "https://th.bing.com/th/id/OIP.h4Wo8pCfo5SyZ1HeK95uogHaHa?w=178&h=180&c=7&r=0&o=7&cb=ucfimg2&dpr=1.3&pid=1.7&rm=3&ucfimg=1",
 
-      allRows = json.table.rows;
-      renderTable(allRows);
-    });
+  "Harry Potter và Hòn đá phù thủy":
+    "https://cungdocsach.vn/wp-content/uploads/2019/10/Harry-potter-v%C3%A0-h%C3%B2n-%C4%91%C3%A1-ph%C3%B9-th%E1%BB%A7y.gif",
 
-  function renderTable(rows) {
-    tableHead.innerHTML = "";
-    tableBody.innerHTML = "";
+  "Dế Mèn phiêu lưu ký":
+    "https://th.bing.com/th/id/OIP.yUnYiZCTzCIjVgo11MiTwgHaHa?w=185&h=185&c=7&r=0&o=7&cb=ucfimg2&dpr=1.3&pid=1.7&rm=3&ucfimg=1"
+};
 
-    // Header
-    const headRow = document.createElement("tr");
-    validColLabels.forEach(label => {
-      const th = document.createElement("th");
-      th.textContent = label;
-      headRow.appendChild(th);
-    });
-    tableHead.appendChild(headRow);
+const SHEET_ID = "1ri9ZDmFpX5H5I1gBJJ2Pup83BfKyj1rCOYJlsX16ueY";
+const SHEET_NAME = "KHO SACH";
 
-    // Body
-    rows.forEach(r => {
-      const tr = document.createElement("tr");
+const searchInput = document.getElementById("searchInput");
+const tableHead = document.querySelector("#bookTable thead");
+const tableBody = document.querySelector("#bookTable tbody");
 
-      validColIndexes.forEach(i => {
-        const cell = r.c[i];
-        const value = cell ? cell.v : "";
-
-        const td = document.createElement("td");
-        td.textContent = value;
-
-        // Click vào Tên sách hoặc Phân loại → mở popup
-    if (i === 1 || i === 2) {
-    td.style.cursor = "pointer";
-    td.style.color = "#e6a24d";
-    td.style.fontWeight = "600";
-
-    td.addEventListener("click", () => openModal(r));
-  }
-        
-        
-
-        // Cảnh báo số lượng thấp
-        if (typeof value === "number" && value <= 3) {
-          td.style.color = "red";
-          td.style.fontWeight = "bold";
-        }
-
-        tr.appendChild(td);
-      });
-
-      tableBody.appendChild(tr);
-    });
-  }
-
-  // ===== TÌM KIẾM THEO TÊN SÁCH =====
-  searchInput.addEventListener("input", () => {
-    const keyword = searchInput.value.trim().toLowerCase();
-
-    if (keyword === "") {
-      renderTable(allRows);
-      return;
-    }
-
-    // Cột "Tên sách" = cột index 1 trong Sheet
-    const filtered = allRows.filter(r => {
-      const bookName = r.c[1]?.v || "";
-      return bookName.toLowerCase().includes(keyword);
-    });
-
-    renderTable(filtered);
-  });
-//   MODAL CHI TIẾT SÁCH
-    const modal = document.getElementById("bookModal");
+const modal = document.getElementById("bookModal");
 const closeBtn = document.querySelector(".close-btn");
+const modalImage = document.getElementById("modalImage");
 
+const url = `https://docs.google.com/spreadsheets/d/${SHEET_ID}/gviz/tq?sheet=${SHEET_NAME}`;
+
+let allRows = [];
+let validColIndexes = [];
+let validColLabels = [];
+
+fetch(url)
+  .then(res => res.text())
+  .then(text => {
+    const json = JSON.parse(text.substring(47).slice(0, -2));
+
+    json.table.cols.forEach((col, index) => {
+      if (col.label && col.label.trim() !== "") {
+        validColIndexes.push(index);
+        validColLabels.push(col.label);
+      }
+    });
+
+    allRows = json.table.rows;
+    renderTable(allRows);
+  });
+
+function renderTable(rows) {
+  tableHead.innerHTML = "";
+  tableBody.innerHTML = "";
+
+  const headRow = document.createElement("tr");
+  validColLabels.forEach(label => {
+    const th = document.createElement("th");
+    th.textContent = label;
+    headRow.appendChild(th);
+  });
+  tableHead.appendChild(headRow);
+
+  rows.forEach(row => {
+    const tr = document.createElement("tr");
+
+    validColIndexes.forEach(i => {
+      const cell = row.c[i];
+      const value = cell ? cell.v : "";
+
+      const td = document.createElement("td");
+      td.textContent = value;
+
+      // Click mở popup (Tên sách / Phân loại)
+      if (i === 1 || i === 2) {
+        td.style.cursor = "pointer";
+        td.style.color = "#e6a24d";
+        td.style.fontWeight = "600";
+        td.onclick = () => openModal(row);
+      }
+
+      // Cảnh báo số lượng thấp
+      if (typeof value === "number" && value <= 3) {
+        td.style.color = "red";
+        td.style.fontWeight = "bold";
+      }
+
+      tr.appendChild(td);
+    });
+
+    tableBody.appendChild(tr);
+  });
+}
+
+// ===== SEARCH =====
+searchInput.addEventListener("input", () => {
+  const keyword = searchInput.value.trim().toLowerCase();
+
+  if (!keyword) {
+    renderTable(allRows);
+    return;
+  }
+
+  const filtered = allRows.filter(r =>
+    (r.c[1]?.v || "").toLowerCase().includes(keyword)
+  );
+
+  renderTable(filtered);
+});
+
+// ===== MODAL =====
 function openModal(row) {
+  const title = row.c[1]?.v || "";
+
   document.getElementById("modalCode").textContent = row.c[0]?.v || "";
-  document.getElementById("modalTitle").textContent = row.c[1]?.v || "";
+  document.getElementById("modalTitle").textContent = title;
   document.getElementById("modalCategory").textContent = row.c[2]?.v || "";
   document.getElementById("modalTotal").textContent = row.c[3]?.v || "";
   document.getElementById("modalBorrowed").textContent = row.c[4]?.v || "";
   document.getElementById("modalRemain").textContent = row.c[5]?.v || "";
 
-  const img = row.c[6]?.v;
+  // 🎯 LẤY ẢNH THEO TÊN SÁCH
+  const img = bookImages[title];
+
   document.getElementById("modalImage").src =
-    img || "https://via.placeholder.com/180x260?text=No+Image";
+    img ? img : "https://via.placeholder.com/180x260?text=No+Image";
 
   modal.style.display = "flex";
 }
 
-closeBtn.onclick = () => (modal.style.display = "none");
 
-window.onclick = e => {
-  if (e.target === modal) modal.style.display = "none";
-};
+closeBtn.onclick = () => modal.style.display = "none";
+window.onclick = e => { if (e.target === modal) modal.style.display = "none"; };
 
 </script>
 
@@ -387,3 +409,4 @@ window.onclick = e => {
 
 </body>
 </html>
+
