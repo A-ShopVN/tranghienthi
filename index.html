@@ -1,0 +1,389 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+  <meta charset="UTF-8">
+  <title>Danh sách sách thư viện</title>
+  <style>
+    /* ===== RESET NHẸ ===== */
+* {
+  box-sizing: border-box;
+}
+
+body {
+  margin: 0;
+  font-family: "Segoe UI", Arial, sans-serif;
+  background-color: #f4f6f8;
+  color: #333;
+}
+
+/* ===== TIÊU ĐỀ ===== */
+h2 {
+  text-align: center;
+  margin: 24px 0 16px;
+  font-size: 24px;
+  font-weight: 600;
+}
+
+/* ===== KHUNG CHỨA ===== */
+.table-wrapper {
+  width: 95%;
+  margin: auto;
+  background: #fff;
+  border-radius: 8px;
+  padding: 16px;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.08);
+}
+
+/* ===== Ô TÌM KIẾM ===== */
+.search-box {
+  display: flex;
+  justify-content: center;
+  margin-bottom: 16px;
+}
+
+
+/* From Uiverse.io by garerim */ 
+.container-input {
+  position: relative;
+}
+
+.input {
+  width: 150px;
+  padding: 10px 0px 10px 40px;
+  border-radius: 9999px;
+  border: solid 1px #333;
+  transition: all .2s ease-in-out;
+  outline: none;
+  opacity: 0.8;
+}
+
+.container-input svg {
+  position: absolute;
+  top: 50%;
+  left: 10px;
+  transform: translate(0, -50%);
+}
+
+.input:focus {
+  opacity: 1;
+  width: 250px;
+}
+
+/* ===== BẢNG ===== */
+table {
+  width: 100%;
+  border-collapse: collapse;
+  font-size: 14px;
+}
+
+/* ===== HEADER ===== */
+thead th {
+  background-color: #e6a24d;
+  color: #fff;
+  padding: 10px;
+  text-align: center;
+  font-weight: 600;
+  position: sticky;
+  top: 0;
+  z-index: 1;
+}
+
+/* ===== BODY ===== */
+tbody td {
+  padding: 10px;
+  text-align: center;
+  border-bottom: 1px solid #e0e0e0;
+}
+
+/* Zebra striping */
+tbody tr:nth-child(even) {
+  background-color: #fafafa;
+}
+
+/* Hover */
+tbody tr:hover {
+  background-color: #fff3e0;
+}
+
+/* ===== CỘT TÊN SÁCH ===== */
+tbody td:nth-child(2) {
+  text-align: left;
+  font-weight: 500;
+}
+
+/* ===== CẢNH BÁO SỐ LƯỢNG ===== */
+td.low {
+  color: #d32f2f;
+  font-weight: 700;
+}
+
+/* ===== RESPONSIVE ===== */
+@media (max-width: 768px) {
+  table {
+    font-size: 12px;
+  }
+
+  thead {
+    display: none;
+  }
+
+  tbody tr {
+    display: block;
+    margin-bottom: 12px;
+    border: 1px solid #ddd;
+    border-radius: 6px;
+    padding: 8px;
+  }
+
+  tbody td {
+    display: flex;
+    justify-content: space-between;
+    padding: 6px 8px;
+    border: none;
+  }
+
+  tbody td::before {
+    content: attr(data-label);
+    font-weight: 600;
+    color: #555;
+  }
+}
+/* ===== MODAL ===== */
+.modal {
+  display: none;
+  position: fixed;
+  inset: 0;
+  background: rgba(0, 0, 0, 0.5);
+  z-index: 999;
+  align-items: center;
+  justify-content: center;
+}
+
+.modal-content {
+  background: #fff;
+  width: 700px;
+  max-width: 95%;
+  border-radius: 10px;
+  padding: 20px;
+  position: relative;
+  animation: fadeIn 0.25s ease;
+}
+
+@keyframes fadeIn {
+  from {
+    transform: scale(0.95);
+    opacity: 0;
+  }
+  to {
+    transform: scale(1);
+    opacity: 1;
+  }
+}
+
+.close-btn {
+  position: absolute;
+  top: 10px;
+  right: 14px;
+  font-size: 22px;
+  cursor: pointer;
+  color: #666;
+}
+
+.modal-body {
+  display: flex;
+  gap: 20px;
+}
+
+.modal-body img {
+  width: 180px;
+  height: 260px;
+  object-fit: cover;
+  border-radius: 6px;
+  border: 1px solid #ddd;
+}
+
+.modal-info h3 {
+  margin-top: 0;
+  margin-bottom: 12px;
+  color: #e6a24d;
+}
+
+.modal-info p {
+  margin: 6px 0;
+  font-size: 14px;
+}
+
+
+  </style>
+</head>
+<body>
+
+<h2>📚 Danh sách sách & số lượng còn lại</h2>
+
+<div class="table-wrapper">
+
+  <div class="search-box">
+    <div class="container-input">
+  <input type="text" placeholder="Search" name="text" class="input" id="searchInput">
+  <svg fill="#000000" width="20px" height="20px" viewBox="0 0 1920 1920" xmlns="http://www.w3.org/2000/svg">
+    <path d="M790.588 1468.235c-373.722 0-677.647-303.924-677.647-677.647 0-373.722 303.925-677.647 677.647-677.647 373.723 0 677.647 303.925 677.647 677.647 0 373.723-303.924 677.647-677.647 677.647Zm596.781-160.715c120.396-138.692 193.807-319.285 193.807-516.932C1581.176 354.748 1226.428 0 790.588 0S0 354.748 0 790.588s354.748 790.588 790.588 790.588c197.647 0 378.24-73.411 516.932-193.807l516.028 516.142 79.963-79.963-516.142-516.028Z" fill-rule="evenodd"></path>
+</svg>
+</div>
+
+  </div>
+
+  <table id="bookTable">
+    <thead></thead>
+    <tbody></tbody>
+  </table>
+  <!-- ===== POPUP CHI TIẾT SÁCH ===== -->
+<div id="bookModal" class="modal">
+  <div class="modal-content">
+    <span class="close-btn">&times;</span>
+
+    <div class="modal-body">
+      <img id="modalImage" src="" alt="Ảnh sách">
+
+      <div class="modal-info">
+        <h3 id="modalTitle"></h3>
+        <p><strong>Mã sách:</strong> <span id="modalCode"></span></p>
+        <p><strong>Phân loại:</strong> <span id="modalCategory"></span></p>
+        <p><strong>Tổng số:</strong> <span id="modalTotal"></span></p>
+        <p><strong>Đang mượn:</strong> <span id="modalBorrowed"></span></p>
+        <p><strong>Còn lại:</strong> <span id="modalRemain"></span></p>
+      </div>
+    </div>
+  </div>
+</div>
+
+
+</div>
+
+
+<script>
+  const SHEET_ID = "1ri9ZDmFpX5H5I1gBJJ2Pup83BfKyj1rCOYJlsX16ueY";
+  const SHEET_NAME = "KHO SACH";
+
+  const searchInput = document.getElementById("searchInput");
+  const tableHead = document.querySelector("#bookTable thead");
+  const tableBody = document.querySelector("#bookTable tbody");
+
+  const url = `https://docs.google.com/spreadsheets/d/${SHEET_ID}/gviz/tq?sheet=${SHEET_NAME}`;
+
+  let allRows = [];
+  let validColIndexes = [];
+  let validColLabels = [];
+
+  fetch(url)
+    .then(res => res.text())
+    .then(text => {
+      const json = JSON.parse(text.substring(47).slice(0, -2));
+
+      // ===== LẤY CHỈ CỘT CÓ TIÊU ĐỀ =====
+      json.table.cols.forEach((col, index) => {
+        if (col.label && col.label.trim() !== "") {
+          validColIndexes.push(index);
+          validColLabels.push(col.label);
+        }
+      });
+
+      allRows = json.table.rows;
+      renderTable(allRows);
+    });
+
+  function renderTable(rows) {
+    tableHead.innerHTML = "";
+    tableBody.innerHTML = "";
+
+    // Header
+    const headRow = document.createElement("tr");
+    validColLabels.forEach(label => {
+      const th = document.createElement("th");
+      th.textContent = label;
+      headRow.appendChild(th);
+    });
+    tableHead.appendChild(headRow);
+
+    // Body
+    rows.forEach(r => {
+      const tr = document.createElement("tr");
+
+      validColIndexes.forEach(i => {
+        const cell = r.c[i];
+        const value = cell ? cell.v : "";
+
+        const td = document.createElement("td");
+        td.textContent = value;
+
+        // Click vào Tên sách hoặc Phân loại → mở popup
+    if (i === 1 || i === 2) {
+    td.style.cursor = "pointer";
+    td.style.color = "#e6a24d";
+    td.style.fontWeight = "600";
+
+    td.addEventListener("click", () => openModal(r));
+  }
+        
+        
+
+        // Cảnh báo số lượng thấp
+        if (typeof value === "number" && value <= 3) {
+          td.style.color = "red";
+          td.style.fontWeight = "bold";
+        }
+
+        tr.appendChild(td);
+      });
+
+      tableBody.appendChild(tr);
+    });
+  }
+
+  // ===== TÌM KIẾM THEO TÊN SÁCH =====
+  searchInput.addEventListener("input", () => {
+    const keyword = searchInput.value.trim().toLowerCase();
+
+    if (keyword === "") {
+      renderTable(allRows);
+      return;
+    }
+
+    // Cột "Tên sách" = cột index 1 trong Sheet
+    const filtered = allRows.filter(r => {
+      const bookName = r.c[1]?.v || "";
+      return bookName.toLowerCase().includes(keyword);
+    });
+
+    renderTable(filtered);
+  });
+//   MODAL CHI TIẾT SÁCH
+    const modal = document.getElementById("bookModal");
+const closeBtn = document.querySelector(".close-btn");
+
+function openModal(row) {
+  document.getElementById("modalCode").textContent = row.c[0]?.v || "";
+  document.getElementById("modalTitle").textContent = row.c[1]?.v || "";
+  document.getElementById("modalCategory").textContent = row.c[2]?.v || "";
+  document.getElementById("modalTotal").textContent = row.c[3]?.v || "";
+  document.getElementById("modalBorrowed").textContent = row.c[4]?.v || "";
+  document.getElementById("modalRemain").textContent = row.c[5]?.v || "";
+
+  const img = row.c[6]?.v;
+  document.getElementById("modalImage").src =
+    img || "https://via.placeholder.com/180x260?text=No+Image";
+
+  modal.style.display = "flex";
+}
+
+closeBtn.onclick = () => (modal.style.display = "none");
+
+window.onclick = e => {
+  if (e.target === modal) modal.style.display = "none";
+};
+
+</script>
+
+
+
+</body>
+</html>
